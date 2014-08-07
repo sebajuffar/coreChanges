@@ -51,6 +51,8 @@ class Enterprise_PageCache_Model_Cookie extends Mage_Core_Model_Cookie
 
     const COOKIE_FORM_KEY           = 'CACHED_FRONT_FORM_KEY';
 
+    const COOKIE_CONFIG_CACHE_KEY   = 'full_page_cache_cookie_info';
+
     /**
      * Subprocessors cookie names
      */
@@ -77,6 +79,13 @@ class Enterprise_PageCache_Model_Cookie extends Mage_Core_Model_Cookie
      * @var sting
      */
     protected $_salt = null;
+
+    /**
+     * Session info
+     *
+     * @var array|null
+     */
+    static protected $_sessionInfo;
 
     /**
      * Retrieve encryption salt
@@ -179,7 +188,7 @@ class Enterprise_PageCache_Model_Cookie extends Mage_Core_Model_Cookie
         $cookieIds = array_unique($cookieIds);
         $cookieIds = array_slice($cookieIds, 0, $countLimit);
         $cookieIds = implode(',', $cookieIds);
-        setcookie(Enterprise_PageCache_Model_Container_Viewedproducts::COOKIE_NAME, $cookieIds, 0, '/');
+        self::_setCookie(Enterprise_PageCache_Model_Container_Viewedproducts::COOKIE_NAME, $cookieIds);
     }
 
     /**
@@ -189,7 +198,7 @@ class Enterprise_PageCache_Model_Cookie extends Mage_Core_Model_Cookie
      */
     public static function setCategoryCookieValue($value)
     {
-        setcookie(self::COOKIE_CATEGORY_PROCESSOR, $value, 0, '/');
+        self::_setCookie(self::COOKIE_CATEGORY_PROCESSOR, $value);
     }
 
     /**
@@ -210,7 +219,7 @@ class Enterprise_PageCache_Model_Cookie extends Mage_Core_Model_Cookie
      */
     public static function setCategoryViewedCookieValue($id)
     {
-        setcookie(self::COOKIE_CATEGORY_ID, $id, 0, '/');
+        self::_setCookie(self::COOKIE_CATEGORY_ID, $id);
     }
 
     /**
@@ -220,7 +229,7 @@ class Enterprise_PageCache_Model_Cookie extends Mage_Core_Model_Cookie
      */
     public static function setFormKeyCookieValue($formKey)
     {
-        setcookie(self::COOKIE_FORM_KEY, $formKey, 0, '/');
+        self::_setCookie(self::COOKIE_FORM_KEY, $formKey);
     }
 
     /**
@@ -231,5 +240,62 @@ class Enterprise_PageCache_Model_Cookie extends Mage_Core_Model_Cookie
     public static function getFormKeyCookieValue()
     {
         return (isset($_COOKIE[self::COOKIE_FORM_KEY])) ? $_COOKIE[self::COOKIE_FORM_KEY] : false;
+    }
+
+    /**
+     * Get session info by frontend cookie
+     *
+     * @return array
+     */
+    protected static function _getSessionInfo()
+    {
+        if (is_null(self::$_sessionInfo)) {
+            $sessionInfo = Enterprise_PageCache_Model_Cache::getCacheInstance()->load(self::COOKIE_CONFIG_CACHE_KEY);
+            if ($sessionInfo) {
+                self::$_sessionInfo = unserialize($sessionInfo);
+            } else {
+                self::setSessionInfo();
+            }
+        }
+        return self::$_sessionInfo;
+    }
+
+    /**
+     * Set cookie with using session info
+     *
+     * @param string $name
+     * @param string $value
+     */
+    protected static function _setCookie($name, $value)
+    {
+        $sessionInfo = self::_getSessionInfo();
+        if (is_array($sessionInfo)) {
+            setcookie($name, $value, 0, $sessionInfo['path'], $sessionInfo['domain'], $sessionInfo['secure'],
+                $sessionInfo['httponly']
+            );
+        }
+    }
+
+    /**
+     * Set session info for frontend cookie
+     */
+    public static function setSessionInfo()
+    {
+        try {
+            $session = Mage::getSingleton('core/session');
+            self::$_sessionInfo = array(
+                'lifetime' => $session->getCookie()->getLifetime(),
+                'path'     => $session->getCookie()->getPath(),
+                'domain'   => $session->getCookie()->getDomain(),
+                'secure'   => $session->getCookie()->isSecure(),
+                'httponly' => $session->getCookie()->getHttponly(),
+            );
+            $cacheData = serialize(self::$_sessionInfo);
+            Enterprise_PageCache_Model_Cache::getCacheInstance()->save($cacheData, self::COOKIE_CONFIG_CACHE_KEY,
+                array(Enterprise_PageCache_Model_Processor::CACHE_TAG)
+            );
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
     }
 }

@@ -355,7 +355,7 @@
                 <observers>
                     <enterprise_pagecache>
                         <class>enterprise_pagecache/observer</class>
-                        <method>invalidateCache</method>
+                        <method>cleanCache</method>
                     </enterprise_pagecache>
                 </observers>
             </catalogrule_after_apply>

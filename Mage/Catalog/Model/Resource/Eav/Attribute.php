@@ -150,9 +150,6 @@ class Mage_Catalog_Model_Resource_Eav_Attribute extends Mage_Eav_Model_Entity_At
          */
         Mage::getSingleton('eav/config')->clear();
 
-        Mage::getSingleton('index/indexer')->processEntityAction(
-            $this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE
-        );
         return parent::_afterSave();
     }
 
@@ -386,5 +383,21 @@ class Mage_Catalog_Model_Resource_Eav_Attribute extends Mage_Eav_Model_Entity_At
         }
 
         return 'source';
+    }
+
+    /**
+     * Callback function which called after transaction commit in resource model
+     *
+     * @return Mage_Catalog_Model_Resource_Eav_Attribute
+     */
+    public function afterCommitCallback()
+    {
+        parent::afterCommitCallback();
+
+        /** @var \Mage_Index_Model_Indexer $indexer */
+        $indexer = Mage::getSingleton('index/indexer');
+        $indexer->processEntityAction($this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
+
+        return $this;
     }
 }

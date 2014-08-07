@@ -50,7 +50,7 @@ class Mage_Eav_Model_Entity_Attribute_Backend_Time_Created extends Mage_Eav_Mode
             }
         } else {
             // convert to UTC
-            $zendDate = Mage::app()->getLocale()->utcDate(null, $date, true);
+            $zendDate = Mage::app()->getLocale()->utcDate(null, strtotime($date), true);
             $object->setData($attributeCode, $zendDate->getIso());
         }
 
@@ -68,6 +68,9 @@ class Mage_Eav_Model_Entity_Attribute_Backend_Time_Created extends Mage_Eav_Mode
         $attributeCode = $this->getAttribute()->getAttributeCode();
         $date = $object->getData($attributeCode);
 
+        if (!is_null($date)){
+            $date = strtotime($date);
+        }
         $zendDate = Mage::app()->getLocale()->storeDate(null, $date, true);
         $object->setData($attributeCode, $zendDate->getIso());
 

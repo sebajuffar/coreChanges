@@ -365,22 +365,6 @@
                     </reindex_url_redirect>
                 </observers>
             </catalog_url_product_shell_reindex_after>
-            <cataloginventory_stock_partial_reindex>
-                <observers>
-                    <invalidate_attribute_indexer>
-                        <class>enterprise_catalog/observer</class>
-                        <method>invalidateAttributeIndexer</method>
-                    </invalidate_attribute_indexer>
-                </observers>
-            </cataloginventory_stock_partial_reindex>
-            <cataloginventory_stock_full_reindex>
-                <observers>
-                    <invalidate_attribute_indexer>
-                        <class>enterprise_catalog/observer</class>
-                        <method>invalidateAttributeIndexer</method>
-                    </invalidate_attribute_indexer>
-                </observers>
-            </cataloginventory_stock_full_reindex>
             <enterprise_url_rewrite_load_after>
                 <observers>
                     <add_sufix_to_url_alias>

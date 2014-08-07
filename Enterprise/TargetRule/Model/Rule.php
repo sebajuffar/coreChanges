@@ -384,4 +384,48 @@ class Enterprise_TargetRule_Model_Rule extends Mage_Rule_Model_Abstract
     {
         return $this;
     }
+
+    /**
+     * Callback function which called after transaction commit in resource model
+     *
+     * @return Enterprise_TargetRule_Model_Rule
+     */
+    public function afterCommitCallback()
+    {
+        parent::afterCommitCallback();
+
+        /** @var \Mage_Index_Model_Indexer $indexer */
+        $indexer = Mage::getSingleton('index/indexer');
+
+        $typeId = (!$this->isObjectNew() && $this->getOrigData('apply_to') != $this->getData('apply_to'))
+            ? null
+            : $this->getData('apply_to');
+
+        $indexer->processEntityAction(
+            new Varien_Object(array('type_id' => $typeId)),
+            Enterprise_TargetRule_Model_Index::ENTITY_TARGETRULE,
+            Enterprise_TargetRule_Model_Index::EVENT_TYPE_CLEAN_TARGETRULES
+        );
+        return $this;
+    }
+
+    /**
+     * Callback function which called after transaction commit in resource model
+     *
+     * @return Enterprise_TargetRule_Model_Rule
+     */
+    public function _afterDeleteCommit()
+    {
+        parent::_afterDeleteCommit();
+
+        /** @var \Mage_Index_Model_Indexer $indexer */
+        $indexer = Mage::getSingleton('index/indexer');
+        $indexer->processEntityAction(
+            new Varien_Object(array('type_id' => $this->getData('apply_to'))),
+            Enterprise_TargetRule_Model_Index::ENTITY_TARGETRULE,
+            Enterprise_TargetRule_Model_Index::EVENT_TYPE_CLEAN_TARGETRULES
+        );
+
+        return $this;
+    }
 }

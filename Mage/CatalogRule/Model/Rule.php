@@ -484,4 +484,18 @@ class Mage_CatalogRule_Model_Rule extends Mage_Rule_Model_Abstract
     {
         return parent::toArray($arrAttributes);
     }
+
+    /**
+     * Load matched product rules to the product
+     *
+     * @param Mage_Catalog_Model_Product $product
+     * @return $this
+     */
+    public function loadProductRules(Mage_Catalog_Model_Product $product)
+    {
+        if (!$product->hasData('matched_rules')) {
+            $product->setMatchedRules($this->getResource()->getProductRuleIds($product->getId()));
+        }
+        return $this;
+    }
 }

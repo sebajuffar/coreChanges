@@ -314,6 +314,17 @@ class Enterprise_PageCache_Model_Observer
     }
 
     /**
+     * Flush full page cache
+     *
+     * @return Enterprise_PageCache_Model_Observer
+     */
+    public function flushCache()
+    {
+        Enterprise_PageCache_Model_Cache::getCacheInstance()->flush();
+        return $this;
+    }
+
+    /**
      * Cleans cache by tags
      *
      * @param Varien_Event_Observer $observer

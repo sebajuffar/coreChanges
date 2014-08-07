@@ -184,7 +184,7 @@ class Mage_Catalog_Model_Layer extends Varien_Object
             $category = Mage::getModel('catalog/category')->load($category);
         }
         if (!$category instanceof Mage_Catalog_Model_Category) {
-            Mage::throwException(Mage::helper('catalog')->__('Category must be an instance of Mage_Catalog_Model_Category.'));
+            Mage::throwException(Mage::helper('catalog')->__('Category must be an instance of Mage_Catalog_Model_Category.' . get_class($category)));
         }
         if (!$category->getId()) {
             Mage::throwException(Mage::helper('catalog')->__('Invalid category.'));

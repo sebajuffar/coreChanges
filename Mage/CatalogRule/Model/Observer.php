@@ -56,6 +56,24 @@ class Mage_CatalogRule_Model_Observer
     }
 
     /**
+     * Load matched catalog price rules for specific product.
+     * Is used for comparison in Mage_CatalogRule_Model_Resource_Rule::applyToProduct method
+     *
+     * @param   Varien_Event_Observer $observer
+     * @return  Mage_CatalogRule_Model_Observer
+     */
+    public function loadProductRules($observer)
+    {
+        /** @var Mage_Catalog_Model_Product $product */
+        $product = $observer->getEvent()->getProduct();
+        if (!$product instanceof Mage_Catalog_Model_Product) {
+            return $this;
+        }
+        Mage::getModel('catalogrule/rule')->loadProductRules($product);
+        return $this;
+    }
+
+    /**
      * Apply all price rules for current date.
      * Handle catalog_product_import_after event
      *

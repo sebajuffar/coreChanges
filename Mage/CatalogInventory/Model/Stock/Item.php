@@ -778,26 +778,6 @@ class Mage_CatalogInventory_Model_Stock_Item extends Mage_Core_Model_Abstract
     }
 
     /**
-     * Reindex CatalogInventory save event
-     *
-     * @return Mage_CatalogInventory_Model_Stock_Item
-     */
-    protected function _afterSave()
-    {
-        parent::_afterSave();
-
-        /** @var $indexer Mage_Index_Model_Indexer */
-        $indexer = Mage::getSingleton('index/indexer');
-        if ($this->_processIndexEvents) {
-            $indexer->processEntityAction($this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
-        } else {
-            $indexer->logEvent($this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
-        }
-        return $this;
-    }
-
-
-    /**
      * Retrieve Stock Availability
      *
      * @return bool|int
@@ -900,6 +880,26 @@ class Mage_CatalogInventory_Model_Stock_Item extends Mage_Core_Model_Abstract
     public function setProcessIndexEvents($process = true)
     {
         $this->_processIndexEvents = $process;
+        return $this;
+    }
+
+    /**
+     * Callback function which called after transaction commit in resource model
+     *
+     * @return Mage_CatalogInventory_Model_Stock_Item
+     */
+    public function afterCommitCallback()
+    {
+        parent::afterCommitCallback();
+
+        /** @var \Mage_Index_Model_Indexer $indexer */
+        $indexer = Mage::getSingleton('index/indexer');
+
+        if ($this->_processIndexEvents) {
+            $indexer->processEntityAction($this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
+        } else {
+            $indexer->logEvent($this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
+        }
         return $this;
     }
 }

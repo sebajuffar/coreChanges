@@ -546,7 +546,12 @@ class Mage_Catalog_Model_Product extends Mage_Catalog_Model_Abstract
         $this->getOptionInstance()->setProduct($this)
             ->saveOptions();
 
-        return parent::_afterSave();
+        $result = parent::_afterSave();
+
+        Mage::getSingleton('index/indexer')->processEntityAction(
+            $this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE
+        );
+        return $result;
     }
 
     /**
@@ -559,7 +564,9 @@ class Mage_Catalog_Model_Product extends Mage_Catalog_Model_Abstract
     {
         $this->_protectFromNonAdmin();
         $this->cleanCache();
-
+        Mage::getSingleton('index/indexer')->logEvent(
+            $this, self::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
+        );
         return parent::_beforeDelete();
     }
 
@@ -571,11 +578,9 @@ class Mage_Catalog_Model_Product extends Mage_Catalog_Model_Abstract
     protected function _afterDeleteCommit()
     {
         parent::_afterDeleteCommit();
-
-        /** @var \Mage_Index_Model_Indexer $indexer */
-        $indexer = Mage::getSingleton('index/indexer');
-
-        $indexer->processEntityAction($this, self::ENTITY, Mage_Index_Model_Event::TYPE_DELETE);
+        Mage::getSingleton('index/indexer')->indexEvents(
+            self::ENTITY, Mage_Index_Model_Event::TYPE_DELETE
+        );
     }
 
     /**
@@ -2075,21 +2080,5 @@ class Mage_Catalog_Model_Product extends Mage_Catalog_Model_Abstract
     public function isDisabled()
     {
         return $this->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED;
-    }
-
-    /**
-     * Callback function which called after transaction commit in resource model
-     *
-     * @return Mage_Catalog_Model_Product
-     */
-    public function afterCommitCallback()
-    {
-        parent::afterCommitCallback();
-
-        /** @var \Mage_Index_Model_Indexer $indexer */
-        $indexer = Mage::getSingleton('index/indexer');
-        $indexer->processEntityAction($this, self::ENTITY, Mage_Index_Model_Event::TYPE_SAVE);
-
-        return $this;
     }
 }

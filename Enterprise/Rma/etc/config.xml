@@ -193,7 +193,7 @@
             <adminhtml>
                 <args>
                     <modules>
-                        <enterprise_rma>Enterprise_Rma_Adminhtml</enterprise_rma>
+                        <enterprise_rma before="Mage_Adminhtml">Enterprise_Rma_Adminhtml</enterprise_rma>
                     </modules>
                 </args>
             </adminhtml>

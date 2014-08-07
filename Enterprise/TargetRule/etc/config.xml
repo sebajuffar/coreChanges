@@ -113,14 +113,6 @@
     </global>
     <adminhtml>
         <events>
-            <catalog_product_save_after>
-                <observers>
-                    <enterprise_targetrule>
-                        <class>enterprise_targetrule/observer</class>
-                        <method>catalogProductAfterSave</method>
-                    </enterprise_targetrule>
-                </observers>
-            </catalog_product_save_after>
             <catalog_product_save_commit_after>
                 <observers>
                     <enterprise_targetrule>

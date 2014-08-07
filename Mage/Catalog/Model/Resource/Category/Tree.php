@@ -292,7 +292,7 @@ class Mage_Catalog_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
      */
     protected function _getInactiveItemIds($collection, $storeId)
     {
-        $filter = $collection->getAllIdsSql();
+        $filter = $collection->getAllIds();
         $attributeId = $this->_getIsActiveAttributeId();
 
         $conditionSql = $this->_conn->getCheckSql('c.value_id > 0', 'c.value', 'd.value');
@@ -308,7 +308,7 @@ class Mage_Catalog_Model_Resource_Category_Tree extends Varien_Data_Tree_Dbp
             ->from(array('d'=>$table), array('d.entity_id'))
             ->where('d.attribute_id = :attribute_id')
             ->where('d.store_id = :zero_store_id')
-            ->where('d.entity_id IN (?)', new Zend_Db_Expr($filter))
+            ->where('d.entity_id IN (?)', $filter)
             ->joinLeft(
                 array('c'=>$table),
                 'c.attribute_id = :attribute_id AND c.store_id = :store_id AND c.entity_id = d.entity_id',

@@ -420,7 +420,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
     }
 
     /**
-     * Get cahce tags associated with object id
+     * Get cache tags associated with object id
      *
      * @return array|bool
      */
@@ -441,7 +441,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
     }
 
     /**
-     * Remove model onject related cache
+     * Remove model object related cache
      *
      * @return Mage_Core_Model_Abstract
      */
@@ -539,7 +539,7 @@ abstract class Mage_Core_Model_Abstract extends Varien_Object
     {
         Mage::dispatchEvent('model_delete_commit_after', array('object'=>$this));
         Mage::dispatchEvent($this->_eventPrefix.'_delete_commit_after', $this->_getEventData());
-         return $this;
+        return $this;
     }
 
     /**

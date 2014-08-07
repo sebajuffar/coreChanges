@@ -337,6 +337,14 @@ class Mage_Catalog_Model_Resource_Category_Flat_Collection extends Mage_Core_Mod
     }
 
     /**
+     * Join request_path column from url rewrite table
+     */
+    public function joinUrlRewrite()
+    {
+        return $this->addUrlRewriteToResult();
+    }
+
+    /**
      * Retrieves store_id from current store
      *
      * @return int

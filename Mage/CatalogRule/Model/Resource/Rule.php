@@ -771,26 +771,52 @@ class Mage_CatalogRule_Model_Resource_Rule extends Mage_Rule_Model_Resource_Abst
         $write = $this->_getWriteAdapter();
         $write->beginTransaction();
 
-        $this->cleanProductData($ruleId, array($productId));
-
-        if (!$this->validateProduct($rule, $product, $websiteIds)) {
+        if ($this->_isProductMatchedRule($ruleId, $product)) {
+            $this->cleanProductData($ruleId, array($productId));
+        }
+        if ($this->validateProduct($rule, $product, $websiteIds)) {
+            try {
+                $this->insertRuleData($rule, $websiteIds, array(
+                    $productId => array_combine(array_values($websiteIds), array_values($websiteIds)))
+                );
+            } catch (Exception $e) {
+                $write->rollback();
+                throw $e;
+            }
+        } else {
             $write->delete($this->getTable('catalogrule/rule_product_price'), array(
                 $write->quoteInto('product_id = ?', $productId),
             ));
-            $write->commit();
-            return $this;
-        }
-
-        try {
-            $this->insertRuleData($rule, $websiteIds, array(
-                $productId => array_combine(array_values($websiteIds), array_values($websiteIds))));
-        } catch (Exception $e) {
-            $write->rollback();
-            throw $e;
         }
 
         $write->commit();
-
         return $this;
+    }
+
+    /**
+     * Get ids of matched rules for specific product
+     *
+     * @param int $productId
+     * @return array
+     */
+    public function getProductRuleIds($productId)
+    {
+        $read = $this->_getReadAdapter();
+        $select = $read->select()->from($this->getTable('catalogrule/rule_product'), 'rule_id');
+        $select->where('product_id = ?', $productId);
+        return array_flip($read->fetchCol($select));
+    }
+
+    /**
+     * Is product has been matched the rule
+     *
+     * @param int $ruleId
+     * @param Mage_Catalog_Model_Product $product
+     * @return bool
+     */
+    protected function _isProductMatchedRule($ruleId, $product)
+    {
+        $rules = $product->getMatchedRules();
+        return isset($rules[$ruleId]);
     }
 }

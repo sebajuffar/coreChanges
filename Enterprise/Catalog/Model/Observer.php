@@ -253,6 +253,7 @@ class Enterprise_Catalog_Model_Observer
      *
      * @param Varien_Event_Observer $observer
      * @return $this
+     * @deprecated since 1.13.0.2
      */
     public function invalidateAttributeIndexer(Varien_Event_Observer $observer)
     {

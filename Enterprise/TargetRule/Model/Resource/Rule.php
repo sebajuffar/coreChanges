@@ -150,16 +150,6 @@ class Enterprise_TargetRule_Model_Resource_Rule extends Mage_Rule_Model_Resource
             $this->bindRuleToEntity($object->getId(), $object->getMatchingProductIds(), 'product');
         }
 
-        $typeId = (!$object->isObjectNew() && $object->getOrigData('apply_to') != $object->getData('apply_to'))
-            ? null
-            : $object->getData('apply_to');
-
-        Mage::getSingleton('index/indexer')->processEntityAction(
-            new Varien_Object(array('type_id' => $typeId)),
-            Enterprise_TargetRule_Model_Index::ENTITY_TARGETRULE,
-            Enterprise_TargetRule_Model_Index::EVENT_TYPE_CLEAN_TARGETRULES
-        );
-
         return $this;
     }
 
@@ -190,25 +180,6 @@ class Enterprise_TargetRule_Model_Resource_Rule extends Mage_Rule_Model_Resource
                 )
             );
         }
-    }
-
-    /**
-     * Clean index
-     *
-     * @param Mage_Core_Model_Abstract|Enterprise_TargetRule_Model_Rule $object
-     *
-     * @return Enterprise_TargetRule_Model_Resource_Rule
-     */
-    protected function _beforeDelete(Mage_Core_Model_Abstract $object)
-    {
-        Mage::getSingleton('index/indexer')->processEntityAction(
-            new Varien_Object(array('type_id' => $object->getData('apply_to'))),
-            Enterprise_TargetRule_Model_Index::ENTITY_TARGETRULE,
-            Enterprise_TargetRule_Model_Index::EVENT_TYPE_CLEAN_TARGETRULES
-        );
-
-        parent::_beforeDelete($object);
-        return $this;
     }
 
     /**

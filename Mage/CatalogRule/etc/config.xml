@@ -152,6 +152,14 @@
                     </catalogrule>
                 </observers>
             </catalog_product_get_final_price>
+            <catalog_product_save_before>
+                <observers>
+                    <catalogrule>
+                        <class>catalogrule/observer</class>
+                        <method>loadProductRules</method>
+                    </catalogrule>
+                </observers>
+            </catalog_product_save_before>
             <catalog_product_save_commit_after>
                 <observers>
                     <catalogrule>

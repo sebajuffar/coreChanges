@@ -52,39 +52,27 @@ class Enterprise_TargetRule_Model_Observer
     }
 
     /**
-     * After Catalog Product Save - rebuild product index by rule conditions
-     * and refresh cache index
-     *
-     * @param Varien_Event_Observer $observer
-     * @return Enterprise_TargetRule_Model_Observer
-     */
-    public function catalogProductAfterSave(Varien_Event_Observer $observer)
-    {
-        /** @var $product Mage_Catalog_Model_Product */
-        $product = $observer->getEvent()->getProduct();
-
-        Mage::getSingleton('index/indexer')->logEvent(
-            new Varien_Object(array(
-                'id' => $product->getId(),
-                'store_id' => $product->getStoreId(),
-                'rule' => $product->getData('rule'),
-                'from_date' => $product->getData('from_date'),
-                'to_date' => $product->getData('to_date')
-            )),
-            Enterprise_TargetRule_Model_Index::ENTITY_PRODUCT,
-            Enterprise_TargetRule_Model_Index::EVENT_TYPE_REINDEX_PRODUCTS
-        );
-        return $this;
-    }
-
-    /**
-     * Process event on 'save_commit_after' event
+     * Process event on 'save_commit_after' event. Rebuild product index by rule conditions
      *
      * @param Varien_Event_Observer $observer
      */
     public function catalogProductSaveCommitAfter(Varien_Event_Observer $observer)
     {
-        Mage::getSingleton('index/indexer')->indexEvents(
+        /** @var $product Mage_Catalog_Model_Product */
+        $product = $observer->getEvent()->getProduct();
+
+        /** @var \Mage_Index_Model_Indexer $indexer */
+        $indexer = Mage::getSingleton('index/indexer');
+        $indexer->processEntityAction(
+            new Varien_Object(
+                array(
+                    'id' => $product->getId(),
+                    'store_id' => $product->getStoreId(),
+                    'rule' => $product->getData('rule'),
+                    'from_date' => $product->getData('from_date'),
+                    'to_date' => $product->getData('to_date')
+                )
+            ),
             Enterprise_TargetRule_Model_Index::ENTITY_PRODUCT,
             Enterprise_TargetRule_Model_Index::EVENT_TYPE_REINDEX_PRODUCTS
         );

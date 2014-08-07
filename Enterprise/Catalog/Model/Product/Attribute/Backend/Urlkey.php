@@ -180,6 +180,8 @@ class Enterprise_Catalog_Model_Product_Attribute_Backend_Urlkey
         // but not allow save existing url key in current store view from another store view
         if (empty($row)) {
             return true;
+        } elseif ( $object->hasData('url_key') && !$object->dataHasChangedFor('url_key')) {
+            return true;
         } elseif ($object->getId() && $object->getStoreId() !== null
                   && ($row['store_id'] == $object->getStoreId() && $row['entity_id'] == $object->getId())
         ) {
